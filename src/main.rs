@@ -20,7 +20,7 @@ fn handle_connection(mut stream:TcpStream){
     println!(
         "Request : {}",
         String::from_utf8_lossy(&buffer[..])); */
-    let contents = fs::read_to_string("../template/index.html").unwrap();
+    let contents = fs::read_to_string("template/index.html").unwrap();
     let response : String = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
                     contents.len(),
                     contents);
