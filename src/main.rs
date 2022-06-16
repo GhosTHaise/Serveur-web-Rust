@@ -1,7 +1,7 @@
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::io::prelude::*;
-
+use std::fs;
 fn main() {
     let listener:TcpListener = TcpListener::bind("127.0.0.1:7879").unwrap();
     
@@ -20,7 +20,11 @@ fn handle_connection(mut stream:TcpStream){
     println!(
         "Request : {}",
         String::from_utf8_lossy(&buffer[..])); */
-    let response : &str = "HTTP/1.1 200 OK/r/n/r/n";
+    let contents = fs::read_to_string("../index.html").unwrap();
+    let response : String = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+                    contents.len(),
+                    contents);
+
     stream.write(response.as_bytes()).unwrap();
     stream.flush().unwrap();
 }
