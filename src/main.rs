@@ -20,11 +20,30 @@ fn handle_connection(mut stream:TcpStream){
     println!(
         "Request : {}",
         String::from_utf8_lossy(&buffer[..])); */
-    let contents = fs::read_to_string("template/index.html").unwrap();
-    let response : String = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
-                    contents.len(),
-                    contents);
+    let get : &[u8;16] = b"GET / HTTP/1.1\r\n"; 
+    
+    if buffer.starts_with(get){
+        let contents : String = fs::read_to_string("template/index.html").unwrap();
+        let response : String = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+                        contents.len(),
+                        contents);
 
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
+    }else{
+        let status_line:&str = "HTTP/1.1 404 NOT FOUND";
+
+        let contents: String = fs::read_to_string("template/Error.html").unwrap();
+        let response : String = format!("{}\r\nContent-lentgh : {}\r\n\r\n{}",
+                status_line,
+                contents.len(),
+                contents);
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
+        let responseView:String =  format!("Response en bytes : {}",response);
+        println!("{:?}",responseView.as_bytes());
+
+    }
+    
+    
 }
