@@ -1,8 +1,10 @@
-use std::thread;
-pub struct ThreadPool{
-    threads : Vec<thread::JoinHandle<()>>
-}
+use std::{sync::mpsc,thread};
 
+pub struct ThreadPool{
+    workers : Vec<Worker>,
+    job : mpsc::Sender<Job>
+}
+struct Job;
 impl ThreadPool {
     //Creer un ThreadPool
     //
@@ -12,11 +14,13 @@ impl ThreadPool {
     //
     pub fn new(size: usize) -> ThreadPool {
         assert!(size > 0);
-        let mut threads = Vec::with_capacity(size);
-        for _ in 0..size {
+        let mut workers = Vec::with_capacity(size);
 
-        }
-        ThreadPool {threads}
+        for id in 0..size {
+            workers.push(Worker::new(id));
+        }  
+
+        ThreadPool {workers}
     }
 
     pub fn execute<F>(&self,f: F)
@@ -25,4 +29,15 @@ impl ThreadPool {
                 {
 
                 }
+}
+struct Worker {
+    id : usize,
+    thread : thread::JoinHandle<()>
+}
+
+impl Worker {
+    fn new(id : usize) -> Worker {
+        let thread = thread::spawn(||{});
+        Worker{id,thread}
+    }
 }
