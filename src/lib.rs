@@ -4,7 +4,7 @@ pub struct ThreadPool{
     workers : Vec<Worker>,
     sender : mpsc::Sender<Job>
 }
-struct Job;
+type Job = Box<dyn FnOnce() + Send + 'static>;
 impl ThreadPool {
     //Creer un ThreadPool
     //
@@ -31,7 +31,8 @@ impl ThreadPool {
         where
             F: FnOnce() + Send + 'static
                 {
-
+                    let job = Box::new(f);
+                    self.sender.send(job).unwrap();
                 }
 }
 struct Worker {
@@ -41,7 +42,12 @@ struct Worker {
 
 impl Worker {
     fn new(id : usize,receiver:Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
-        let thread = thread::spawn(||{});
+        let thread = thread::spawn(move || loop{
+             let job = receiver.lock().unwrap().recv().unwrap();
+             println!("Worker {} got a job ; executing ...",id);
+        });
+       
+
         Worker{id,thread}
     }
 }
