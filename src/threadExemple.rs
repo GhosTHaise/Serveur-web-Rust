@@ -11,6 +11,7 @@ let answer = 42u32;
 tx.send(answer);
 });
 }
+//tester avec un pattern matching la valeur recu du channel
 match rx.recv() {
 Ok(data) => println!("Le channel vient de recevoir : {}", data),
 Err(e) => println!("Une erreur s'est produite : {:?}", e)
